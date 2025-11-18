@@ -9,7 +9,9 @@ flags = {
     "view_features": False,
     "extract_labels": False,
     "view_labels": False,
-    "train": True
+    "train": False,
+    "training_metrics": False,
+    "test_model": True
 }
 
 if __name__ == "__main__":
@@ -71,3 +73,22 @@ if __name__ == "__main__":
             labels_dir='data/train/labels/'
         )
         print("CNN model training completed.")
+
+    if flags["training_metrics"]:
+        from util.metrics import analyse_training_run
+
+        print("Analysing training metrics...")
+        analyse_training_run(log_dir='./logs/cnn/model_4/')
+        print("Training metrics analysis done.")
+
+    if flags["test_model"]:
+        from cnn.test import test_cnn_model
+
+        print("Testing CNN model...")
+        test_cnn_model(
+            model_path='./logs/cnn/model_4/models/cnn_final.pt',
+            test_samples_path='data/test/noisy/',
+            output_dir='data/test/enhanced/',
+            sample_test=True
+        )
+        print("CNN model testing completed.")
