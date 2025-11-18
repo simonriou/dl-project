@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import soundfile as sf
 from audio.spectro import *
-from cnn.cnn import build_cnn_mask_model
+from cnn.cnnMask import build_cnn_mask_model
 from tqdm import tqdm
 
 

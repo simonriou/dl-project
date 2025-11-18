@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
-from cnn.cnn import build_cnn_mask_model
+from cnn.cnnMask import build_cnn_mask_model
 from cnn.data import SpectrogramDataset
 from tqdm import tqdm
 
