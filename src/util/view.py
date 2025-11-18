@@ -1,10 +1,10 @@
 import os
 import random
 import matplotlib.pyplot as plt
-import soundfile as fs
 import torch
 import numpy as np
 
+from audio.load import load_audio
 from constants import *
 
 def plot_feature(dir, fname=None, compare_speech=False):
@@ -17,7 +17,7 @@ def plot_feature(dir, fname=None, compare_speech=False):
         speech_fname = f"{file_id}.flac"
         speech_path = os.path.join('data/train/speech/', speech_fname)
         # Load and plot the speech signal
-        speech_signal, sr = fs.read(speech_path)
+        speech_signal, sr = load_audio(speech_path)
         if sr != SAMPLE_RATE:
             raise ValueError(f"Loading comparison speech | Sample rate mismatch: expected {SAMPLE_RATE}, got {sr}")
         

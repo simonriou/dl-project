@@ -1,9 +1,9 @@
 import os
 import numpy as np
-import soundfile as sf
 import torch
 from tqdm import tqdm
 
+from audio.load import load_audio
 from constants import *
 
 def compute_IBM(signal, noise):
@@ -65,10 +65,10 @@ def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir):
         fpath = f"{noise_dir}/{noise_type}/{noise_file_name}"
 
         # Load speech and noise signals
-        speech_signal, sr = sf.read(f"{speech_dir}/{fname}")
+        speech_signal, sr = load_audio(f"{speech_dir}/{fname}")
         if sr != SAMPLE_RATE:
             raise ValueError(f"Importing speech signal | Sample rate mismatch: expected {SAMPLE_RATE}, got {sr}")
-        noise_signal, sr = sf.read(fpath)
+        noise_signal, sr = load_audio(fpath)
         if sr != SAMPLE_RATE:
             raise ValueError(f"Importing noise signal | Sample rate mismatch: expected {SAMPLE_RATE}, got {sr}")
         

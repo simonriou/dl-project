@@ -1,9 +1,9 @@
 import os
 import numpy as np
-import soundfile as sf
 from tqdm import tqdm
 import torch
 
+from audio.load import load_audio
 from constants import *
 
 def extract_features(input_dir, output_dir):
@@ -16,7 +16,7 @@ def extract_features(input_dir, output_dir):
         path = os.path.join(input_dir, fname)
 
         # Load the audio
-        y, sr = sf.read(path)
+        y, sr = load_audio(path)
         if sr != SAMPLE_RATE:
             raise ValueError(f"Loading feature audio | Expected sample rate {SAMPLE_RATE}, but got {sr}")
         

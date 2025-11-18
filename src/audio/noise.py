@@ -1,9 +1,10 @@
 import os
-import soundfile as sf
 import numpy as np
 from tqdm import tqdm
+import soundfile as sf
 import random
 
+from audio.load import load_audio
 from constants import *
 
 def add_noise(speech_dir, noise_type, snr_db, output_dir):
@@ -21,7 +22,7 @@ def add_noise(speech_dir, noise_type, snr_db, output_dir):
         speech_path = os.path.join(speech_dir, fname)
 
         # Load the speech file
-        speech, sr = sf.read(speech_path)
+        speech, sr = load_audio(speech_path)
         if sr != SAMPLE_RATE:
             raise ValueError(f"Loading speech | Expected sample rate {SAMPLE_RATE}, but got {sr}")
         
@@ -45,7 +46,7 @@ def add_noise(speech_dir, noise_type, snr_db, output_dir):
 
         # ------- 2: Select random file & segment -------
         noise_file = random.choice(noise_files)
-        noise, sr = sf.read(os.path.join(noise_dir, noise_file))
+        noise, sr = load_audio(os.path.join(noise_dir, noise_file))
         if sr != SAMPLE_RATE:
             raise ValueError(f"Loading noise | Expected sample rate {SAMPLE_RATE}, but got {sr}")
         
