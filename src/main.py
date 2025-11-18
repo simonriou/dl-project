@@ -8,8 +8,8 @@ flags = {
     "extract_features": False,
     "view_features": False,
     "extract_labels": False,
-    "view_labels": False,
-    "train": True,
+    "view_labels": True,
+    "train": False,
     "training_metrics": False,
     "test_model": False
 }
@@ -52,7 +52,8 @@ if __name__ == "__main__":
             speech_dir='data/train/speech/',
             noisy_dir='data/train/noisy/',
             noise_dir='data/noise/',
-            output_dir='data/train/labels/'
+            output_dir='data/train/labels/',
+            mode='irm'
         )
         print("Label extraction completed.")
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
 
         print("Testing CNN model...")
         test_cnn_model(
-            model_path='./logs/cnn/model_4/models/cnn_final.pt',
+            model_path='./logs/cnn/model_5/models/cnn_final.pt',
             test_samples_path='data/test/noisy/',
             output_dir='data/test/enhanced/',
             sample_test=True

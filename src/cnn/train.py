@@ -26,7 +26,8 @@ def train_cnn_model(log_dir, features_dir, labels_dir):
 
     # Build model
     model = build_cnn_mask_model().to(device)
-    criterion = nn.BCELoss()
+    # criterion = nn.BCELoss()
+    criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     print(f"Model parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")

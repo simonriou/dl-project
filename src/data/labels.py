@@ -37,7 +37,43 @@ def compute_IBM(signal, noise):
     IBM = (S_power >= N_power).float()
     return IBM.numpy()
 
-def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir):
+def compute_IRM(signal, noise, beta):
+    signal = signal / (np.max(np.abs(signal)) + EPSILON)
+    noise = noise / (np.max(np.abs(noise)) + EPSILON)
+
+    signal_t = torch.tensor(signal, dtype=torch.float32)
+    noise_t = torch.tensor(noise, dtype=torch.float32)
+
+    S = torch.stft(
+        signal_t,
+        n_fft=NFFT,
+        hop_length=HOP_LENGTH,
+        win_length=WIN_LENGTH,
+        window=torch.hann_window(WIN_LENGTH),
+        return_complex=True
+    )
+
+    N = torch.stft(
+        noise_t,
+        n_fft=NFFT,
+        hop_length=HOP_LENGTH,
+        win_length=WIN_LENGTH,
+        window=torch.hann_window(WIN_LENGTH),
+        return_complex=True
+    )
+
+    S_mag = torch.abs(S) ** beta
+    N_mag = torch.abs(N) ** beta
+
+    IRM = S_mag / (S_mag + N_mag + EPSILON)
+    return IRM.numpy()
+
+def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
+    print(mode.lower())
+
+    if (mode.lower() != "ibm") & (mode.lower() != 'irm'):
+        raise ValueError("Mode must be either 'ibm' or 'irm'")
+
     os.makedirs(output_dir, exist_ok=True)
 
     noisy_files = os.listdir(noisy_dir)
@@ -75,10 +111,12 @@ def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir):
         noise_segment = noise_signal[start_idx:start_idx + len(speech_signal)]
 
         # Compute IBM
-        ibm = compute_IBM(speech_signal, noise_segment)
+        mask = None
+        if mode.lower() == 'ibm': mask = compute_IBM(speech_signal, noise_segment)
+        elif mode.lower() == 'irm': mask = compute_IRM(speech_signal, noise_segment, beta=0.5)
 
         # Save as .npy to output_dir
-        ibm_output_path = os.path.join(output_dir, f"{speech_id}_ibm.npy")
-        np.save(ibm_output_path, ibm)
+        ibm_output_path = os.path.join(output_dir, f"{speech_id}_{mode.lower()}.npy")
+        np.save(ibm_output_path, mask)
 
     print("Label extraction completed.")
