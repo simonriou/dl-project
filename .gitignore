@@ -1,5 +1,6 @@
 /data/
-/logs/
 /.vscode/
 .DS_Store
 __pycache__
+checkpoints/
+history/
