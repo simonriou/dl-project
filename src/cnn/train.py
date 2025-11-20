@@ -10,7 +10,8 @@ from tqdm import tqdm
 
 from constants import *
 
-def train_cnn_model(log_dir, features_dir, labels_dir):
+
+def train_cnn_model(log_dir, features_dir, labels_dir, mode='ibm'):
     os.makedirs(f"{log_dir}/models/", exist_ok=True)
     os.makedirs(f"{log_dir}/checkpoints/", exist_ok=True)
     os.makedirs(f"{log_dir}/history/", exist_ok=True)
@@ -28,7 +29,7 @@ def train_cnn_model(log_dir, features_dir, labels_dir):
     model = build_cnn_mask_model().to(device)
     # criterion = nn.BCELoss()
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=5e-4)
 
     print(f"Model parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
@@ -37,13 +38,15 @@ def train_cnn_model(log_dir, features_dir, labels_dir):
         features_dir=features_dir,
         labels_dir=labels_dir,
         validation_split=VAL_SPLIT,
-        subset="training"
+        subset="training",
+        mode=mode
     )
     val_ds = SpectrogramDataset(
         features_dir=features_dir,
         labels_dir=labels_dir,
         validation_split=VAL_SPLIT,
-        subset="validation"
+        subset="validation",
+        mode=mode
     )
 
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True)

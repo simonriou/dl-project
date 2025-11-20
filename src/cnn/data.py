@@ -4,9 +4,10 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, features_dir, labels_dir, validation_split=0.0, subset=None):
+    def __init__(self, features_dir, labels_dir, mode='ibm', validation_split=0.0, subset=None):
         self.features_dir = features_dir
         self.labels_dir = labels_dir
+        self.mode = mode
 
         # List all feature files
         self.files = sorted([f for f in os.listdir(features_dir) if f.endswith('.npy')])
@@ -27,7 +28,7 @@ class SpectrogramDataset(Dataset):
     def __getitem__(self, idx):
         fname = self.files[idx]
         feat_path = os.path.join(self.features_dir, fname)
-        label_fname = fname.split('_')[0] + '_ibm.npy'
+        label_fname = fname.split('_')[0] + f'_{self.mode}.npy'
         label_path = os.path.join(self.labels_dir, label_fname)
 
         feat = np.load(feat_path).astype(np.float32)
