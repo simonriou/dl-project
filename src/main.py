@@ -10,8 +10,8 @@ flags = {
     "extract_labels": False,
     "view_labels": False,
     "train": False,
-    "training_metrics": True,
-    "test_model": False
+    "training_metrics": False,
+    "test_model": True
 }
 
 if __name__ == "__main__":
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             noisy_dir='data/train/noisy/',
             noise_dir='data/noise/',
             output_dir='data/train/labels/',
-            mode='irm'
+            mode='irm' # ibm, irm or spectro
         )
         print("Label extraction completed.")
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             log_dir='./logs/cnn/model_5/',
             features_dir='data/train/features/',
             labels_dir='data/train/labels/',
-            mode='ibm' # ibm or irm
+            mode='irm' # ibm, irm or spectro
         )
         print("CNN model training completed.")
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         from util.metrics import analyse_training_run
 
         print("Analysing training metrics...")
-        analyse_training_run(log_dir='./logs/cnn/model_6/')
+        analyse_training_run(log_dir='./logs/cnn/model_7/')
         print("Training metrics analysis done.")
 
     if flags["test_model"]:
@@ -88,9 +88,10 @@ if __name__ == "__main__":
 
         print("Testing CNN model...")
         test_cnn_model(
-            model_path='./logs/cnn/model_6/models/cnn_final.pt',
+            model_path='./logs/cnn/model_7/models/cnn_final.pt',
             test_samples_path='data/test/noisy/',
             output_dir='data/test/enhanced/',
+            mode='spectro',  # ibm, irm or spectro
             sample_test=True
         )
         print("CNN model testing completed.")

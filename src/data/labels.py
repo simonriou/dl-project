@@ -71,8 +71,8 @@ def compute_IRM(signal, noise, beta):
 def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
     print(mode.lower())
 
-    if (mode.lower() != "ibm") & (mode.lower() != 'irm'):
-        raise ValueError("Mode must be either 'ibm' or 'irm'")
+    if (mode.lower() != "ibm") & (mode.lower() != 'irm') & (mode.lower() != 'spectro'):
+        raise ValueError("Mode must be either 'ibm', 'irm' or 'spectro'")
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -110,10 +110,23 @@ def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
         
         noise_segment = noise_signal[start_idx:start_idx + len(speech_signal)]
 
-        # Compute IBM
+        # Compute label
         mask = None
         if mode.lower() == 'ibm': mask = compute_IBM(speech_signal, noise_segment)
         elif mode.lower() == 'irm': mask = compute_IRM(speech_signal, noise_segment, beta=0.5)
+        elif mode.lower() == 'spectro':
+            # Compute spectrogram of clean speech
+            speech_signal = speech_signal / (np.max(np.abs(speech_signal)) + EPSILON)
+            signal_t = torch.tensor(speech_signal, dtype=torch.float32)
+            S = torch.stft(
+                signal_t,
+                n_fft=NFFT,
+                hop_length=HOP_LENGTH,
+                win_length=WIN_LENGTH,
+                window=torch.hann_window(WIN_LENGTH),
+                return_complex=True
+            )
+            mask = torch.abs(S).numpy()
 
         # Save as .npy to output_dir
         ibm_output_path = os.path.join(output_dir, f"{speech_id}_{mode.lower()}.npy")

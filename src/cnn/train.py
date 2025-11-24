@@ -5,6 +5,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 from cnn.cnnMask import build_cnn_mask_model
+from cnn.cnnDirect import build_cnn_direct_model
 from cnn.data import SpectrogramDataset
 from tqdm import tqdm
 
@@ -25,10 +26,24 @@ def train_cnn_model(log_dir, features_dir, labels_dir, mode='ibm'):
 
     print(f"Using device: {device}")
 
+    mode = mode.lower()
+
     # Build model
-    model = build_cnn_mask_model().to(device)
-    # criterion = nn.BCELoss()
-    criterion = nn.MSELoss()
+    if mode == 'ibm' or mode == 'irm':
+        model = build_cnn_mask_model().to(device)  # for mask estimation
+    elif mode == 'spectro':
+        model = build_cnn_direct_model().to(device)  # for spectrogram regression
+    else:
+        raise ValueError("mode must be 'ibm', 'irm' or 'spectro'")
+    
+    # Select criterion
+    if mode == 'ibm':
+        criterion = nn.BCELoss()  # for mask estimation
+    elif mode == 'irm':
+        criterion = nn.MSELoss()  # for mask estimation
+    elif mode == 'spectro':
+        criterion = nn.L1Loss()  # for spectrogram regression
+
     optimizer = optim.Adam(model.parameters(), lr=5e-4)
 
     print(f"Model parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
@@ -77,7 +92,12 @@ def train_cnn_model(log_dir, features_dir, labels_dir, mode='ibm'):
 
             optimizer.zero_grad()
             y_pred = model(X)
-            loss = criterion(y_pred, y)
+
+            if mode in ['ibm', 'irm']:
+                loss = criterion(y_pred, y)  # for mask estimation
+            elif mode == 'spectro':
+                loss = criterion(torch.log1p(y_pred), torch.log1p(y))
+                
             loss.backward()
             optimizer.step()
 

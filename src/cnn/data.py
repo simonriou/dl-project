@@ -1,10 +1,10 @@
 import os
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, features_dir, labels_dir, mode='ibm', validation_split=0.0, subset=None):
+    def __init__(self, features_dir, labels_dir, mode='ibm', validation_split=0.0, subset=None): # mode can be ibm, irm or spectro
         self.features_dir = features_dir
         self.labels_dir = labels_dir
         self.mode = mode

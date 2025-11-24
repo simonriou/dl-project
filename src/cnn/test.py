@@ -7,7 +7,7 @@ from cnn.cnnMask import build_cnn_mask_model
 from tqdm import tqdm
 
 
-def test_cnn_model(model_path, test_samples_path, output_dir, sample_test=False):
+def test_cnn_model(model_path, test_samples_path, output_dir, mode='ibm', sample_test=False):
     os.makedirs(output_dir, exist_ok=True)
 
     if torch.cuda.is_available():
@@ -29,17 +29,31 @@ def test_cnn_model(model_path, test_samples_path, output_dir, sample_test=False)
         path = os.path.join(test_samples_path, filename)
         mag, phase, orig_len = audio_to_spectrogram(path)
 
-        # Predict mask
-        with torch.no_grad():
-            mag_tensor = mag.float().to(device)
-            predicted_mask = model(mag_tensor)[0, 0].cpu().numpy()
+        if mode.lower() not in ['ibm', 'irm', 'spectro']:
+            raise ValueError("Mode must be either 'ibm', 'irm' or 'spectro'")
+        
+        if mode.lower() in ['ibm', 'irm']:
+            # Predict mask
+            with torch.no_grad():
+                mag_tensor = mag.float().to(device)
+                predicted_mask = model(mag_tensor)[0, 0].cpu().numpy()
 
-        # Apply mask
-        enhanced_mag = np.abs(mag[0, 0]) * predicted_mask
+            # Apply mask
+            enhanced_mag = np.abs(mag[0, 0]) * predicted_mask
 
-        # Reconstruct waveform
-        enhanced = spectrogram_to_audio(enhanced_mag, phase)
-        enhanced = enhanced[:orig_len]
+            # Reconstruct waveform
+            enhanced = spectrogram_to_audio(enhanced_mag, phase)
+            enhanced = enhanced[:orig_len]
+
+        elif mode.lower() == 'spectro':
+            # Predict spectrogram
+            with torch.no_grad():
+                mag_tensor = mag.float().to(device)
+                predicted_spectro = model(mag_tensor)[0, 0].cpu().numpy()
+
+            # Reconstruct waveform
+            enhanced = spectrogram_to_audio(predicted_spectro, phase)
+            enhanced = enhanced[:orig_len]
 
         # Save
         out_path = os.path.join(output_dir, f"{os.path.splitext(filename)[0]}_enhanced.wav")
