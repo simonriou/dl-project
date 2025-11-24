@@ -9,9 +9,9 @@ flags = {
     "view_features": False,
     "extract_labels": False,
     "view_labels": False,
-    "train": False,
+    "train": True,
     "training_metrics": False,
-    "test_model": True
+    "test_model": False
 }
 
 if __name__ == "__main__":
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
         print("Training CNN model...")
         train_cnn_model(
-            log_dir='./logs/cnn/model_5/',
+            log_dir='./logs/cnn/model_8/',
             features_dir='data/train/features/',
             labels_dir='data/train/labels/',
             mode='spectro' # ibm, irm or spectro

@@ -69,8 +69,6 @@ def compute_IRM(signal, noise, beta):
     return IRM.numpy()
 
 def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
-    print(mode.lower())
-
     if (mode.lower() != "ibm") & (mode.lower() != 'irm') & (mode.lower() != 'spectro'):
         raise ValueError("Mode must be either 'ibm', 'irm' or 'spectro'")
 
@@ -117,7 +115,17 @@ def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
         elif mode.lower() == 'spectro':
             # Compute spectrogram of clean speech
             speech_signal = speech_signal / (np.max(np.abs(speech_signal)) + EPSILON)
+
+            # Convert to mono if needed
+            if speech_signal.ndim > 1:
+                speech_signal = speech_signal.mean(axis=1)
+
             signal_t = torch.tensor(speech_signal, dtype=torch.float32)
+
+            # Convert to a 1D tensor
+            signal_t = torch.tensor(speech_signal, dtype=torch.float32)
+
+            # STFT
             S = torch.stft(
                 signal_t,
                 n_fft=NFFT,
@@ -126,7 +134,13 @@ def extract_labels(speech_dir, noisy_dir, noise_dir, output_dir, mode):
                 window=torch.hann_window(WIN_LENGTH),
                 return_complex=True
             )
-            mask = torch.abs(S).numpy()
+
+            # Power spectrogram
+            S_power = torch.abs(S) ** 2
+
+            # Log-spectrogram
+            log_S = torch.log(S_power + EPSILON)
+            mask = log_S.numpy()
 
         # Save as .npy to output_dir
         ibm_output_path = os.path.join(output_dir, f"{speech_id}_{mode.lower()}.npy")

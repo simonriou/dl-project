@@ -44,6 +44,9 @@ def train_cnn_model(log_dir, features_dir, labels_dir, mode='ibm'):
     elif mode == 'spectro':
         criterion = nn.L1Loss()  # for spectrogram regression
 
+    print(f"Training with mode '{mode}' using {criterion._get_name()} loss.")
+    print(f"Using model: {model.__class__.__name__}")
+
     optimizer = optim.Adam(model.parameters(), lr=5e-4)
 
     print(f"Model parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
