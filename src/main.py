@@ -53,7 +53,7 @@ if __name__ == "__main__":
             noisy_dir='data/train/noisy/',
             noise_dir='data/noise/',
             output_dir='data/train/labels/',
-            mode='irm' # ibm, irm or spectro
+            mode='spectro' # ibm, irm or spectro
         )
         print("Label extraction completed.")
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             log_dir='./logs/cnn/model_5/',
             features_dir='data/train/features/',
             labels_dir='data/train/labels/',
-            mode='irm' # ibm, irm or spectro
+            mode='spectro' # ibm, irm or spectro
         )
         print("CNN model training completed.")
 
