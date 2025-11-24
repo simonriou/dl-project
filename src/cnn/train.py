@@ -96,10 +96,7 @@ def train_cnn_model(log_dir, features_dir, labels_dir, mode='ibm'):
             optimizer.zero_grad()
             y_pred = model(X)
 
-            if mode in ['ibm', 'irm']:
-                loss = criterion(y_pred, y)  # for mask estimation
-            elif mode == 'spectro':
-                loss = criterion(torch.log1p(y_pred), torch.log1p(y))
+            loss = criterion(y_pred, y)
                 
             loss.backward()
             optimizer.step()
